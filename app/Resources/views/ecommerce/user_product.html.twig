@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}E-Commerce{% endblock %}
+
+{% block body %}
+    {% if product %}
+        <table id="articles" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.category_id }}</td>
+                        <td>{{ product.price }}</td>
+                        <td>{{ product.available_qty }}</td>
+                        <td>
+                            <a href="/article/{{ product.id }}" class="btn btn-dark">Detail</a>
+                            <a href="/article/edit/{{ product.id }}" class="btn btn-light edit-article" data-id="{{ product.id }}">Add to Cart</a>
+                            {# <a href="#" class="btn btn-danger delete-article" data-id="{{ product.id }}">Delete</a> #}
+
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No product in here</p>        
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/js/main.js"></script>
+{% endblock %}
