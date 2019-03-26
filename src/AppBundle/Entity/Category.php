@@ -29,14 +29,7 @@ class Category
      */
     private $category;
 
-    /**
-     * @ORM\OneToMany(targetEntity = "Product", mappedBy="category")
-     */
-    private $product;
 
-    public function __construct(){
-        $this->product = new ArrayCollection();
-    }
 
 
     /**

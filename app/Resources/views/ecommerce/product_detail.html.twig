@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{product.name}}{% endblock %}
+
+{% block body %}
+  <h1>{{product.name}}</h1>
+  <p>{{product.description}}</p>
+  <br>
+  <h3>Price: {{product.price}}</h3>
+  <h4> Stock: {{product.availableQty}}
+  <br>
+  <a href="/article/edit/{{ product.id }}" class="btn btn-light edit-article" data-id="{{ product.id }}">Add to Cart</a>
+  <hr>
+{% endblock %}

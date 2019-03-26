@@ -16,18 +16,26 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 class UserProductController extends Controller{
      /**
      * @Route("/product", name="product_list")
-     * @Method({"GET"})
+     * Method({"GET"})
      */
     public function getProduct(){
 
         $product = $this->getDoctrine()->getRepository(Product::class)->findAll();
         return $this->render('ecommerce/user_product.html.twig', array('product' => $product));
-
     }
 
     /**
-     * @Route{"/product/cart/{id}" name="add_to_cart"}
-     * @Method({"GET", "POST"})
+     * @Route("/product/{id}", name="product_detail")
+     * Method({"GET"})}
+     */
+    public function getProductDetail($id){
+        $product = $this->getDoctrine()->getRepository(Product::class)->find($id);
+        return $this->render('ecommerce/product_detail.html.twig', array('product' => $product));
+    }
+
+    /**
+     * @Route("/product/addtocart/{id}", name="add_to_cart")
+     * Method({"GET", "POST"})
      */
     public function addProductToCart(Request $request, $id){
         
