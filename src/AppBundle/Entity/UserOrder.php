@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="user_order")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserOrderRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class UserOrder
 {
@@ -25,20 +26,23 @@ class UserOrder
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ORM\Version
      */
     private $createdAt;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="user_id", type="integer")
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     private $userId;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="address_id", type="integer")
+     * @ORM\ManyToOne(targetEntity="OrderAddress")
+     * @ORM\JoinColumn(name="address_id", referencedColumnName="id")
      */
     private $addressId;
 
@@ -54,14 +58,22 @@ class UserOrder
      *
      * @ORM\Column(name="status", type="string", length=100)
      */
-    private $status;
+    private $status = "Waiting for approval";
 
     /**
-     * @var bool
+     * @var string
      *
-     * @ORM\Column(name="approval", type="boolean")
+     * @ORM\Column(name="approval", type="string", length=100)
      */
-    private $approval;
+    private $approval = "Pending";
+
+    /** 
+     *  @ORM\PrePersist 
+    */
+    public function timestampOnPrePersist()
+    {
+        $this->setCreatedAt = date('Y-m-d H:i:s');
+    }
 
 
     /**
@@ -197,7 +209,7 @@ class UserOrder
     /**
      * Set approval
      *
-     * @param boolean $approval
+     * @param string $approval
      *
      * @return UserOrder
      */
@@ -211,7 +223,7 @@ class UserOrder
     /**
      * Get approval
      *
-     * @return bool
+     * @return string
      */
     public function getApproval()
     {

@@ -10,4 +10,20 @@ namespace AppBundle\Repository;
  */
 class CartRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function getCartId($id){
+        return $this->createQueryBuilder('Cart')
+                        ->where("Cart.user_id = :id")
+                        ->setParameter('id', $id)
+                        ->select('Cart.id')
+                        ->getQuery()
+                        ->execute();
+    }
+    public function getUserCartCount($id){
+        return $this->createQueryBuilder('c')
+                        ->andWhere('c.userId = :id')
+                        ->setParameter('id', $id)
+                        ->select('COUNT(c.userId) as userCart')
+                        ->getQuery()
+                        ->getSingleScalarResult();
+    }
 }

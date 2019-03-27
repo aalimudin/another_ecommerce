@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="cart_item")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\CartItemRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class CartItem
 {
@@ -47,17 +48,22 @@ class CartItem
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ORM\Version
      */
     private $createdAt;
 
     /**
      * @var int
      *
-     * @ORM\ManyToOne(targetEntity="Cart", inversedBy="cartItems")
+     * @ORM\ManyToOne(targetEntity="Cart")
      * @ORM\JoinColumn(name="cart_id", referencedColumnName="id")
      */
     private $cartId;
 
+    public function timestampOnPrePersist()
+    {
+        $this->setCreatedAt = date('Y-m-d H:i:s');
+    }
 
     /**
      * Get id

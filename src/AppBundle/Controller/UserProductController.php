@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Product;
 use AppBundle\Entity\User;
 use AppBundle\Entity\Cart;
+use AppBundle\Entity\CartItem;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,6 +13,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use \DateTime;
+use Psr\Log\LoggerInterface;
 
 class UserProductController extends Controller{
      /**
@@ -37,42 +40,70 @@ class UserProductController extends Controller{
      * @Route("/product/addtocart/{id}", name="add_to_cart")
      * Method({"GET", "POST"})
      */
-    public function addProductToCart(Request $request, $id){
+    public function addProductToCart(Request $request, $id, LoggerInterface $logger = null){
         
         $cart = new Cart();
         $product = new Product();
+        $cartItem = new CartItem();
+        // $datetime = new DateTime();
 
-        $user = $this->container->get('security.context')->getToken()->getUser();
-        $userId = $user->getId();
+        $userId= $this->container->get('security.context')->getToken()->getUser();
+        // $userId = $user->getId();
 
-        $form = $this->createFormBuilder($cart)
-                        ->add('amount', IntegerType::class, array('attr' => array('class' => 'form-contol')))
+        $form = $this->createFormBuilder($cartItem)
+                        ->add('quantity', IntegerType::class, array('attr' => array('class' => 'form-contol')))
                         ->add('add_to_cart', SubmitType::class, array('label' => 'Add to Cart', 'attr' 
                             => array('class' => 'btn tbn-primary mt-5')))
                         ->getForm();
 
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid()){
-            $stock = $this->getDoctrine()->getRepository(Product::class)->getProductStock($id);
-            $amount = $form["amount"]->getData();
-            $price = $this->getDoctrine()->getRepository(Product::class)->getProductPrice($id);
+        // if($form->isSubmitted() && $form->isValid()){ 
+            $stock = $this->getDoctrine()->getRepository(Product::class)->findOneById($id)->getAvailableQty();
 
-            $cart->setUserId($userId);
-            $cart->setProductId($id);
-            $cart->setPrice($price);
-            $cart->setAmount($amount);
-            $cart->setTotalPrice($price * $amount);
-
-            $product->setStock($stock - $amount);
-
-            $entityManagerCart = $this->getDoctrine()->getManager('cart');
+            $quantity = 3;
+            $price = $this->getDoctrine()->getRepository(Product::class)->findOneById($id)->getPrice();
+            $qtyHold = $this->getDoctrine()->getRepository(Product::class)->findOneById($id)->getQtyHold();
+            $product = $this->getDoctrine()->getRepository(Product::class)->find($id);
+            $userCartCount = $this->getDoctrine()->getRepository(Cart::class)->getUserCartCount($userId);
             $entityManager = $this->getDoctrine()->getManager();
 
-            $entityManagerCart->persist($cart);
+            if($qtyHold - $quantity <= 0){
+                $this->get('session')->getFlashBag()->add('error', 'Stock not enough');
+            }
+
+            $qtyHold = $qtyHold - $quantity;
+            
+            // dump($userCartCount);
+            // die;
+
+            if($userCartCount == 0){
+                $cart->setUserId($userId);
+    
+                $entityManager->persist($cart);
+                
+                $entityManager->flush();
+            }
+
+            $cartId = $this->getDoctrine()->getRepository(Cart::class)->findOneByUserId($userId);
+
+            // dump($cartId);
+            // die();
+            $cartItem->setCartId($cartId);
+            $cartItem->setProductId($product);   
+            $cartItem->setQuantity($quantity);
+            $cartItem->setTotalPrice($price * $quantity);
+
+            $product->setAvailableQty($stock - $quantity);
+            $product->setQtyHold($qtyHold);
+
+            $entityManager->persist($cartItem);
             $entityManager->persist($product);
-            $entityManagerCart->flush();
             $entityManager->flush();
-        }   
+            $entityManager->flush();
+
+            return $this->redirectToRoute('product_list');
+        // }   
+        return $this->render('ecommerce/added_to_cart.html.twig', array('form' => $form->createView()));
     }   
 }

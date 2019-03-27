@@ -11,6 +11,7 @@ use AppBundle\Entity\CartItem;
  *
  * @ORM\Table(name="cart")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\CartRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Cart
 {
@@ -34,18 +35,24 @@ class Cart
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ORM\Version
      */
     private $createdAt;
 
     /**
-     * @ORM\OneToMany(targetEntity="CartItem", mappedBy="productId")
+     * @var int
+     *
+     * @ORM\Column(name="total_price", type="integer", nullable=true)
      */
-    private $cartItem;
+    private $totalPrice = 0;
 
-    public function __construct(){
-        $this->cartItem = new ArrayCollection();
+    /** 
+     *  @ORM\PrePersist 
+    */
+    public function timestampOnPrePersist()
+    {
+        $this->setCreatedAt = date('Y-m-d H:i:s');
     }
-
 
     /**
      * Get id
@@ -90,6 +97,7 @@ class Cart
      */
     public function setCreatedAt($createdAt)
     {
+        
         $this->createdAt = $createdAt;
 
         return $this;
@@ -103,6 +111,31 @@ class Cart
     public function getCreatedAt()
     {
         return $this->createdAt;
+    }
+
+    /**
+     * Set totalPrice
+     *
+     * @param integer $totalPrice
+     *
+     * @return Cart
+     */
+    public function setTotalPrice($totalPrice)
+    {
+        
+        $this->totalPrice = $totalPrice;
+
+        return $this;
+    }
+
+    /**
+     * Get totalPrice
+     *
+     * @return int
+     */
+    public function getTotalPrice()
+    {
+        return $this->totalPrice;
     }
 }
 

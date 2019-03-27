@@ -24,8 +24,8 @@ class OrderAddress
     /**
      * @var int
      *
-     * @ORM\ManyToOne(targetEntity = "User")
-     * @ORM\JoinColumn(name = "user_id", referencedColumnName = "id")
+     * @ORM\ManyToOne(targetEntity = "UserOrder")
+     * @ORM\JoinColumn(name = "order_id", referencedColumnName = "id")
      */
     private $orderId;
 

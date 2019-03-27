@@ -52,7 +52,8 @@ class OrderItem
     /**
      * @var int
      *
-     * @ORM\Column(name="order_id", type="integer")
+     * @ORM\ManyToOne(targetEntity="UserOrder")
+     * @ORM\JoinColumn(name="order_id", referencedColumnName="id")
      */
     private $orderId;
 
