@@ -42,14 +42,14 @@ class UserOrder
      * @var int
      *
      * @ORM\ManyToOne(targetEntity="OrderAddress")
-     * @ORM\JoinColumn(name="address_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="address_id", referencedColumnName="id", nullable=true)
      */
     private $addressId;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="total_price", type="integer")
+     * @ORM\Column(name="total_price", type="integer", nullable=true)
      */
     private $totalPrice;
 

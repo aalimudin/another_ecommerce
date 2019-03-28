@@ -30,9 +30,20 @@ class ProductRepository extends \Doctrine\ORM\EntityRepository
                         ->execute();
     }
 
-    // public function getProductWithCategory(){
-    //     return $this->createQueryBuilder('Product, p')
-    //                     ->innerJoin();
-    // }
+    public function getProductWithCategory(){
+        return $this->createQueryBuilder('p')
+                        ->select('p.id', 'p.name', 'cat.category AS category', 'p.availableQty', 'p.price')
+                        ->innerJoin('p.categoryId', 'cat', 'WITH', 'p.categoryId = cat.id')
+                        ->getQuery()
+                        ->execute();
+    }
+
+    public function getCategoryProduct($id){
+        return $this->createQueryBuilder('p')
+                        ->where('p.categoryId = :id')
+                        ->setParameter('id', $id)
+                        ->getQuery()
+                        ->execute();
+    }
 
 }

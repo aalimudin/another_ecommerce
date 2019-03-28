@@ -2,7 +2,8 @@
 
 namespace AppBundle\Controller;
 
-use App\Entity\Category;
+use AppBundle\Entity\Category;
+use AppBundle\Entity\Product;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,5 +34,15 @@ class CategoryController extends Controller{
 
         $response = new Response();
         $response->send();
+    }
+
+    /**
+     * @Route("/category/{id}", name="category_product")
+     * Method({"GET"})
+     */
+    public function getCategoryProduct($id){
+        $categories = $this->getDoctrine()->getRepository(Product::class)->getCategoryProduct($id);
+        dump($categories);
+        die;
     }
 }

@@ -23,7 +23,8 @@ class UserProductController extends Controller{
      */
     public function getProduct(){
 
-        $product = $this->getDoctrine()->getRepository(Product::class)->findAll();
+        // $product = $this->getDoctrine()->getRepository(Product::class)->findAll();
+        $product = $this->getDoctrine()->getRepository(Product::class)->getProductWithCategory();
         return $this->render('ecommerce/user_product.html.twig', array('product' => $product));
     }
 
@@ -64,45 +65,55 @@ class UserProductController extends Controller{
             $quantity = 3;
             $price = $this->getDoctrine()->getRepository(Product::class)->findOneById($id)->getPrice();
             $qtyHold = $this->getDoctrine()->getRepository(Product::class)->findOneById($id)->getQtyHold();
+            $availableQty = $this->getDoctrine()->getRepository(Product::class)->findOneById($id)->getAvailableQty();
             $product = $this->getDoctrine()->getRepository(Product::class)->find($id);
             $userCartCount = $this->getDoctrine()->getRepository(Cart::class)->getUserCartCount($userId);
             $entityManager = $this->getDoctrine()->getManager();
 
-            if($qtyHold - $quantity <= 0){
+            if($availableQty - $quantity <= 0){
                 $this->get('session')->getFlashBag()->add('error', 'Stock not enough');
-            }
-
-            $qtyHold = $qtyHold - $quantity;
+                return $this->redirectToRoute('product_list'); 
+            } else {
+                $qtyHold = $qtyHold + $quantity;
             
-            // dump($userCartCount);
-            // die;
+                // dump($userCartCount);
+                // die;
 
-            if($userCartCount == 0){
-                $cart->setUserId($userId);
-    
-                $entityManager->persist($cart);
+                if($userCartCount == 0){
+                    $cart->setUserId($userId);
+        
+                    $entityManager->persist($cart);
+                    
+                    $entityManager->flush();
+                }
+
+                $cartId = $this->getDoctrine()->getRepository(Cart::class)->findOneByUserId($userId);
+
+                // dump($cartId);
+                // die();
+                $cartItem->setCartId($cartId);
+                $cartItem->setProductId($product);   
+                $cartItem->setQuantity($quantity);
+                $cartItem->setTotalPrice($price * $quantity);
+
+                $totalPrice = $this->getDoctrine()->getRepository(CartItem::class)->getCartTotalPrice($cartId);
                 
+                $cartId->setTotalPrice($totalPrice);
+
+                $product->setAvailableQty($stock - $quantity);
+                $product->setQtyHold($qtyHold);
+                // dump($product);
+                // die();
+
+                // $entityManager->merge($cart);
+                $entityManager->persist($cartItem);
+                $entityManager->persist($product);
                 $entityManager->flush();
+                $entityManager->flush();
+
+                return $this->redirectToRoute('product_list');                
             }
 
-            $cartId = $this->getDoctrine()->getRepository(Cart::class)->findOneByUserId($userId);
-
-            // dump($cartId);
-            // die();
-            $cartItem->setCartId($cartId);
-            $cartItem->setProductId($product);   
-            $cartItem->setQuantity($quantity);
-            $cartItem->setTotalPrice($price * $quantity);
-
-            $product->setAvailableQty($stock - $quantity);
-            $product->setQtyHold($qtyHold);
-
-            $entityManager->persist($cartItem);
-            $entityManager->persist($product);
-            $entityManager->flush();
-            $entityManager->flush();
-
-            return $this->redirectToRoute('product_list');
         // }   
         return $this->render('ecommerce/added_to_cart.html.twig', array('form' => $form->createView()));
     }   

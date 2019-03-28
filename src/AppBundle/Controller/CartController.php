@@ -7,6 +7,7 @@ use AppBundle\Entity\User;
 use AppBundle\Entity\Cart;
 use AppBundle\Entity\CartItem;
 use AppBundle\Entity\UserOrder;
+use AppBundle\Entity\Address;
 use AppBundle\Enttiy\OrderAddress;
 use AppBundle\Entity\OrderItem;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +22,7 @@ use Psr\Log\LoggerInterface;
 
 class CartController extends Controller{
     /**
-     * @Route("/cart" name="cart_item_list")
+     * @Route("/cart", name="cart_item_list")
      * Method({"GET"})
      */
     public function getUserCart(){
@@ -29,28 +30,45 @@ class CartController extends Controller{
         $userId=$user->getId();
 
         $userCart = $this->getDoctrine()->getRepository(Cart::class)->findOneByUserId($userId)->getId();
-        $cartItems = $this->getDoctrine()->getRepository(CartItem::class)->findByCartId($userCart);
-        dump($cartItems);
-        die;
+        $cartItems = $this->getDoctrine()->getRepository(CartItem::class)->getUserCart($userCart);
+        // dump($cartItems);
+        // die;
+        return $this->render('ecommerce/cart.html.twig', array('cartItems' => $cartItems));
     }
 
     /**
-     * @Route("/cart/delete/{id}" name="delete_cart_item")
+     * @Route("/cart/delete/{id}", name="delete_cart_item")
      * Method({"DELETE"})
      */
     public function deleteCartItem(Request $request, $id){
-        $cartItem = $this->getDoctrine()->getRepository(CartItem::class)->find($id);
+        $product = new Product();
+
+        $cartItem = $this->getDoctrine()->getRepository(CartItem::class)->findOneById($id);
+        $productId = $this->getDoctrine()->getRepository(CartItem::class)->findOneById($id)->getProductId();
+        $quantity = $this->getDoctrine()->getRepository(CartItem::class)->findOneById($id)->getQuantity();
+        $product = $this->getDoctrine()->getRepository(Product::class)->findOneById($productId);
+        $qtyHold =  $this->getDoctrine()->getRepository(Product::class)->findOneById($productId)->getQtyHold();
+        $availableQty = $this->getDoctrine()->getRepository(Product::class)->findOneById($productId)->getAvailableQty();
+
+        $qtyHold = $qtyHold - $quantity;
+        $availableQty = $availableQty + $quantity;
+
+        $product->setQtyHold($qtyHold);
+        $product->setAvailableQty($availableQty);
 
         $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($product);
         $entityManager->remove($cartItem);
         $entityManager->flush();
 
         $response = new Response();
         $response->send();
+
+        return $this->redirectToRoute('cart_item_list');
     }
 
     /**
-     * @Route("/cart/delete/all" name="delete_all_cart_item")
+     * @Route("/cart/delete/all", name="delete_all_cart_item")
      * Method({"DELETE"})
      */
     public function deleteAllCartItem(Request $request){
@@ -59,6 +77,9 @@ class CartController extends Controller{
 
         $userCart = $this->getDoctrine()->getRepository(Cart::class)->findOneByUserId($userId)->getId();
         $cartItems = $this->getDoctrine()->getRepository(CartItem::class)->findByCartId($userCart);
+
+        dump($cartItems);
+        die;
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($cartItems);
@@ -69,10 +90,35 @@ class CartController extends Controller{
     }
 
     /**
-     * @Route("/cart/checkout" name="cart_checkout")
+     * @Route("/cart/checkout", name="cart_checkout")
      * Method({"POST"})
      */
-    public function cartCheckOut(Request $request, $address_id){
+    public function cartCheckOut(Request $request, $id, $address_id){
+        $userOrder = new UserOrder();
+        $orderAddress = new OrderAddress();
+        $orderItem = new OrderItem();
+
+        $user= $this->container->get('security.context')->getToken()->getUser();
+        $userId=$user->getId();
+
+        $userCart = $this->getDoctrine()->getRepository(Cart::class)->findOneByUserId($userId);
+        $userCartId = $userCart->getId();
+        $cartItems = $this->getDoctrine()->getRepository(CartItem::class)->findByCartId($userCartId);
+
+        $address = $this->getDoctrine()->getRepository(Address::class)->findById($Id);
+        $orderAddress->setAddress($address->getAddress());
+
+        $userOrder->setUserId($userCart);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($userOrder);
+        $entityManager->flush();
+
         
+
+        $entityManager->persist($orderAddress);
+        $entityManager->flush();
+
+
+
     }
 }

@@ -10,4 +10,23 @@ namespace AppBundle\Repository;
  */
 class CartItemRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function getCartTotalPrice($id){
+        return $this->createQueryBuilder('CartItem')
+                        ->andWhere('CartItem.cartId = :id')
+                        ->setParameter('id', $id)
+                        ->select('SUM(CartItem.totalPrice) as totalPrice')
+                        ->getQuery()
+                        ->getSingleScalarResult();
+                        
+    }
+
+    public function getUserCart($id){
+        return $this->createQueryBuilder('ci')
+                        ->andWhere('ci.cartId = :id')
+                        ->select('p.name', 'ci.id', 'ci.quantity', 'ci.totalPrice')
+                        ->innerJoin('ci.productId', 'p', 'WITH', 'ci.productId = p.id')
+                        ->setParameter('id', $id)
+                        ->getQuery()
+                        ->execute();
+    }
 }
