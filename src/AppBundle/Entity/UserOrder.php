@@ -39,12 +39,12 @@ class UserOrder
     private $userId;
 
     /**
-     * @var int
+     * @var string
      *
-     * @ORM\ManyToOne(targetEntity="OrderAddress")
-     * @ORM\JoinColumn(name="address_id", referencedColumnName="id", nullable=true)
+     * @ORM\Column(name="order_address", type="string", length=255)
+     * 
      */
-    private $addressId;
+    private $orderAddress;
 
     /**
      * @var int
@@ -135,27 +135,27 @@ class UserOrder
     }
 
     /**
-     * Set addressId
+     * Set orderAddress
      *
-     * @param integer $addressId
+     * @param string $orderAddress
      *
      * @return UserOrder
      */
-    public function setAddressId($addressId)
+    public function setOrderAddress($orderAddress)
     {
-        $this->addressId = $addressId;
+        $this->orderAddress = $orderAddress;
 
         return $this;
     }
 
     /**
-     * Get addressId
+     * Get orderAddress
      *
-     * @return int
+     * @return string
      */
-    public function getAddressId()
+    public function getOrderAddress()
     {
-        return $this->addressId;
+        return $this->orderAddress;
     }
 
     /**

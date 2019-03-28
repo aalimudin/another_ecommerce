@@ -2,6 +2,8 @@
 
 namespace AppBundle\Repository;
 
+use Doctrine\ORM\Query;
+
 /**
  * CartItemRepository
  *
@@ -28,5 +30,14 @@ class CartItemRepository extends \Doctrine\ORM\EntityRepository
                         ->setParameter('id', $id)
                         ->getQuery()
                         ->execute();
+    }
+
+    public function getItemIdArray($id){
+        return $this->createQueryBuilder('ci')
+                        ->andWhere('ci.cartId = :id')
+                        ->select('ci.id')
+                        ->setParameter('id', $id)
+                        ->getQuery()
+                        ->getResult(Query::HYDRATE_ARRAY);
     }
 }

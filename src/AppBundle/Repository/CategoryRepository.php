@@ -10,11 +10,4 @@ namespace AppBundle\Repository;
  */
 class CategoryRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function getCategoryProduct($id){
-        return $this->createQueryBuilder('cat')
-                        ->where('cat.id = :id')
-                        ->setParameter('id', $id)
-                        ->getQuery()
-                        ->execute();
-    }
 }

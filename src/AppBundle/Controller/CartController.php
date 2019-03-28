@@ -8,7 +8,7 @@ use AppBundle\Entity\Cart;
 use AppBundle\Entity\CartItem;
 use AppBundle\Entity\UserOrder;
 use AppBundle\Entity\Address;
-use AppBundle\Enttiy\OrderAddress;
+use AppBundle\Entity\OrderAddress;
 use AppBundle\Entity\OrderItem;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,8 +31,9 @@ class CartController extends Controller{
 
         $userCart = $this->getDoctrine()->getRepository(Cart::class)->findOneByUserId($userId)->getId();
         $cartItems = $this->getDoctrine()->getRepository(CartItem::class)->getUserCart($userCart);
-        // dump($cartItems);
-        // die;
+
+        dump($cartItem);
+        die;
         return $this->render('ecommerce/cart.html.twig', array('cartItems' => $cartItems));
     }
 
@@ -93,7 +94,8 @@ class CartController extends Controller{
      * @Route("/cart/checkout", name="cart_checkout")
      * Method({"POST"})
      */
-    public function cartCheckOut(Request $request, $id, $address_id){
+    public function cartCheckOut(){
+        $id = 179;
         $userOrder = new UserOrder();
         $orderAddress = new OrderAddress();
         $orderItem = new OrderItem();
@@ -105,20 +107,26 @@ class CartController extends Controller{
         $userCartId = $userCart->getId();
         $cartItems = $this->getDoctrine()->getRepository(CartItem::class)->findByCartId($userCartId);
 
-        $address = $this->getDoctrine()->getRepository(Address::class)->findById($Id);
-        $orderAddress->setAddress($address->getAddress());
+        $address = $this->getDoctrine()->getRepository(Address::class)->findOneByUserId($userId)->getAddress();
+        // dump($address);
+        // die;
+        // $orderAddress->setAddress($address->getAddress());
 
-        $userOrder->setUserId($userCart);
+        $userOrder->setUserId($user);
+        $userOrder->setOrderAddress($address);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($userOrder);
         $entityManager->flush();
 
-        
+        $orderId = $this->getDoctrine()->getRepository(UserOrder::class)->getLatestUserOrder($userCartId);
+        dump($orderId);
+        die;
 
-        $entityManager->persist($orderAddress);
-        $entityManager->flush();
-
-
-
+        // $cartItem = $this->getDoctrine()->getRepository(CartItem::class)->getItemIdArray($userCart);
+        // foreach($cartItems as $cartItem){
+        //     $orderItem = $this->getDoctrine()->getRepository(CartItem::class)->find($cartItem['id']);
+        //     $orderItem->setOrderId($orderId);
+            
+        // }
     }
 }
