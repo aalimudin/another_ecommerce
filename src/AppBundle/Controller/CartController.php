@@ -118,15 +118,28 @@ class CartController extends Controller{
         $entityManager->persist($userOrder);
         $entityManager->flush();
 
-        $orderId = $this->getDoctrine()->getRepository(UserOrder::class)->getLatestUserOrder($userCartId);
-        dump($orderId);
-        die;
+        $orderId = $this->getDoctrine()->getRepository(UserOrder::class)->getLatestUserOrder($userId);
+        // dump($cartItems);
+        // die;
 
-        // $cartItem = $this->getDoctrine()->getRepository(CartItem::class)->getItemIdArray($userCart);
-        // foreach($cartItems as $cartItem){
-        //     $orderItem = $this->getDoctrine()->getRepository(CartItem::class)->find($cartItem['id']);
-        //     $orderItem->setOrderId($orderId);
+
+        $idCartItem= $this->getDoctrine()->getRepository(CartItem::class)->getItemIdArray($userCart);
+        // dump($idCartItem);
+        // die;
+
+        foreach($idCartItem as $idCartItem){
+            $cartProductId = $this->getDoctrine()->getRepository(CartItem::class)->find($idCartItem['id'])->getProductId();
+            $cartProduct = $this->getDoctrine()->getRepository(Product::class)->findOneById($cartProductId);
+            $cartQuantity = $this->getDoctrine()->getRepository(CartItem::class)->find($idCartItem['id'])->getQuantity();
+            $cartTotalPrice = $this->getDoctrine()->getRepository(CartItem::class)->find($idCartItem['id'])->getTotalPrice();
             
-        // }
+            $orderItem->setProductId($cartProduct);
+            $orderItem->setQuantity($cartQuantity);
+            $orderItem->setTotalPrice($cartTotalPrice);
+            $orderItem->setOrderId($orderId);
+
+            $entityManager->persist($orderItem);
+            $entityManager->flush();
+        }
     }
 }
