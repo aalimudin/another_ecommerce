@@ -13,11 +13,10 @@ class UserOrderRepository extends \Doctrine\ORM\EntityRepository
     public function getLatestUserOrder($userId){
         return $this->createQueryBuilder('uor')
                         ->where('uor.userId = :userId')
-                        // ->select('uor.id')
                         ->setParameter('userId', $userId)
                         ->orderBy('uor.createdAt', 'DESC')
                         ->setMaxResults(1)
                         ->getQuery()
-                        ->getResult();
+                        ->getSingleResult();
     }
 }

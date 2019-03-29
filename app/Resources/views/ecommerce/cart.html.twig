@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}E-Commerce{% endblock %}
+{% block title %}Cart{% endblock %}
 
 {% block body %}
     {% if cartItems %}
@@ -35,6 +35,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        <a href="/cart/checkout" class="btn btn-dark">Checkout</a>
     {% else %}
         <p>No product in here</p>        
     {% endif %}

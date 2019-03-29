@@ -18,7 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use \DateTime;
-use Psr\Log\LoggerInterface;
 
 class CartController extends Controller{
     /**
@@ -32,8 +31,8 @@ class CartController extends Controller{
         $userCart = $this->getDoctrine()->getRepository(Cart::class)->findOneByUserId($userId)->getId();
         $cartItems = $this->getDoctrine()->getRepository(CartItem::class)->getUserCart($userCart);
 
-        dump($cartItem);
-        die;
+        // dump($cartItem);
+        // die;
         return $this->render('ecommerce/cart.html.twig', array('cartItems' => $cartItems));
     }
 
@@ -42,14 +41,12 @@ class CartController extends Controller{
      * Method({"DELETE"})
      */
     public function deleteCartItem(Request $request, $id){
-        $product = new Product();
-
         $cartItem = $this->getDoctrine()->getRepository(CartItem::class)->findOneById($id);
-        $productId = $this->getDoctrine()->getRepository(CartItem::class)->findOneById($id)->getProductId();
-        $quantity = $this->getDoctrine()->getRepository(CartItem::class)->findOneById($id)->getQuantity();
+        $productId = $cartItem->getProductId();
+        $quantity = $cartItem->getQuantity();
         $product = $this->getDoctrine()->getRepository(Product::class)->findOneById($productId);
-        $qtyHold =  $this->getDoctrine()->getRepository(Product::class)->findOneById($productId)->getQtyHold();
-        $availableQty = $this->getDoctrine()->getRepository(Product::class)->findOneById($productId)->getAvailableQty();
+        $qtyHold =  $product->getQtyHold();
+        $availableQty = $product->getAvailableQty();
 
         $qtyHold = $qtyHold - $quantity;
         $availableQty = $availableQty + $quantity;
@@ -106,6 +103,7 @@ class CartController extends Controller{
         $userCart = $this->getDoctrine()->getRepository(Cart::class)->findOneByUserId($userId);
         $userCartId = $userCart->getId();
         $cartItems = $this->getDoctrine()->getRepository(CartItem::class)->findByCartId($userCartId);
+        $cartTotalPrice = $this->getDoctrine()->getRepository(CartItem::class)->getCartTotalPrice($userCartId);
 
         $address = $this->getDoctrine()->getRepository(Address::class)->findOneByUserId($userId)->getAddress();
         // dump($address);
@@ -114,6 +112,7 @@ class CartController extends Controller{
 
         $userOrder->setUserId($user);
         $userOrder->setOrderAddress($address);
+        $userOrder->setTotalPrice($cartTotalPrice);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($userOrder);
         $entityManager->flush();
@@ -122,16 +121,19 @@ class CartController extends Controller{
         // dump($cartItems);
         // die;
 
-
-        $idCartItem= $this->getDoctrine()->getRepository(CartItem::class)->getItemIdArray($userCart);
-        // dump($idCartItem);
+        $idCartItems= $this->getDoctrine()->getRepository(CartItem::class)->getItemIdArray($userCart);
+        // dump($idCartItems);
         // die;
 
-        foreach($idCartItem as $idCartItem){
+        foreach($idCartItems as $idCartItem){
+            // dump($idCartItem['id']);
+            
             $cartProductId = $this->getDoctrine()->getRepository(CartItem::class)->find($idCartItem['id'])->getProductId();
             $cartProduct = $this->getDoctrine()->getRepository(Product::class)->findOneById($cartProductId);
+
             $cartQuantity = $this->getDoctrine()->getRepository(CartItem::class)->find($idCartItem['id'])->getQuantity();
             $cartTotalPrice = $this->getDoctrine()->getRepository(CartItem::class)->find($idCartItem['id'])->getTotalPrice();
+            $orderItem = new OrderItem();
             
             $orderItem->setProductId($cartProduct);
             $orderItem->setQuantity($cartQuantity);
@@ -139,7 +141,9 @@ class CartController extends Controller{
             $orderItem->setOrderId($orderId);
 
             $entityManager->persist($orderItem);
-            $entityManager->flush();
         }
+        // die;
+        $entityManager->flush();
+        return $this->render('ecommerce/added_to_cart.html.twig');
     }
 }

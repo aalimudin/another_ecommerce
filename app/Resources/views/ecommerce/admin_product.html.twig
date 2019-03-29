@@ -28,13 +28,8 @@
                         <td>{{ product.availableQty }}</td>
                         <td>
                             <a href="/product/{{ product.id }}" class="btn btn-dark">Detail</a>
-                        <td>
-                          <span>{{form_start(form)}}
-                            {{form_widget(form)}}
-                            {{form_end(form)}}</span>
-                        <td>
                             <a href="/product/addtocart/{{ product.id }}" class="btn btn-light btn-secondary add-to-cart" data-id="{{ product.id }}">Add to Cart</a>
-                            {# <a href="#" class="btn btn-danger delete-article" data-id="{{ product.id }}">Delete</a> #}
+                            <a href="#" class="btn btn-danger delete-article" data-id="{{ product.id }}">Delete</a>
                         </td>
                     </tr>
                 {% endfor %}

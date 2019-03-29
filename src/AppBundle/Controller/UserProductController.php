@@ -13,8 +13,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use \DateTime;
-use Psr\Log\LoggerInterface;
+use AppBundle\Form\Type\StockFormType;
 
 class UserProductController extends Controller{
      /**
@@ -24,8 +23,10 @@ class UserProductController extends Controller{
     public function getProduct(){
 
         // $product = $this->getDoctrine()->getRepository(Product::class)->findAll();
+        $cartItem = new CartItem();
         $product = $this->getDoctrine()->getRepository(Product::class)->getProductWithCategory();
-        return $this->render('ecommerce/user_product.html.twig', array('product' => $product));
+        $form = $this->createForm('AppBundle\Form\Type\StockFormType', $cartItem);
+        return $this->render('ecommerce/user_product.html.twig', array('product' => $product, 'form' => $form->createView()));
     }
 
     /**
@@ -41,7 +42,7 @@ class UserProductController extends Controller{
      * @Route("/product/addtocart/{id}", name="add_to_cart")
      * Method({"GET", "POST"})
      */
-    public function addProductToCart(Request $request, $id, LoggerInterface $logger = null){
+    public function addProductToCart(Request $request, $id){
         
         $cart = new Cart();
         $product = new Product();

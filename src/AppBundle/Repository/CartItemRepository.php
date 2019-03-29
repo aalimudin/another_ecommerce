@@ -38,6 +38,6 @@ class CartItemRepository extends \Doctrine\ORM\EntityRepository
                         ->select('ci.id')
                         ->setParameter('id', $id)
                         ->getQuery()
-                        ->getResult(Query::HYDRATE_ARRAY);
+                        ->getResult();
     }
 }

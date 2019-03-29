@@ -24,7 +24,8 @@ class OrderItem
     /**
      * @var int
      *
-     * @ORM\Column(name="product_id", type="integer")
+     * @ORM\ManyToOne(targetEntity="Product")
+     * @ORM\JoinColumn(name="product_id", referencedColumnName="id")
      */
     private $productId;
 
@@ -46,6 +47,7 @@ class OrderItem
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ORM\Version
      */
     private $createdAt;
 
@@ -57,6 +59,10 @@ class OrderItem
      */
     private $orderId;
 
+    public function timestampOnPrePersist()
+    {
+        $this->setCreatedAt = date('Y-m-d H:i:s');
+    }
 
     /**
      * Get id

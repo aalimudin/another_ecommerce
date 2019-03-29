@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}E-Commerce{% endblock %}
+
+{% block body %}
+    {% if phone %}
+        <table id="phone" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Phone</th>
+                    <th><a href="/phone/new" class="btn btn-dark">New</a></th>
+                </tr>
+            </thead>
+            <tbody>
+            {# {% for flashMessage in app.session.flashbag.get('error') %}
+
+                {{ flashMessage }}
+
+            {% endfor %} #}
+                {% for phone in phone %}
+                    <tr>
+                        <td>{{ phone.phone}}</td>
+                        <td>
+                            <a href="/phone/edit/{{ phone.id }}" class="btn btn-dark" data-id="{{ phone.id }}">Edit</a>
+                            <a href="/phone/delete/{{ phone.id }}" class="btn btn-danger delete-article">Delete</a>
+                            {# {{form_start(form)}}
+                            {{form_widget(form)}}
+                            {{form_end(form)}} #}
+                            {# <a href="#" class="btn btn-danger delete-article" data-id="{{ product.id }}">Delete</a> #}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No phone in here</p>  
+        <th><a href="/phone/new" class="btn btn-dark">New</a></th>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/js/main.js"></script>
+{% endblock %}

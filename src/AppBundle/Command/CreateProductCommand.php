@@ -34,15 +34,15 @@ class CreateProductCommand extends ContainerAwareCommand{
         $product = new Product();
 
         $entityManager = $this->getContainer()->get('doctrine')->getEntityManager();
+        $category = $this->getContainer()->get('doctrine')->getRepository(Category::class)->find($input->getArgument('category_id'));
 
         $product->setName($input->getArgument('name'));
-        $product->setCategoryId($input->getArgument('category_id'));
+        $product->setCategoryId($category);
         $product->setDescription($input->getArgument('description'));
         $product->setPrice($input->getArgument('price'));
         $product->setStock($input->getArgument('stock'));
         $product->setQtyHold(0);
         $product->setAvailableQty($input->getArgument('stock'));
-
 
         $entityManager->persist($product);
         $entityManager->flush();

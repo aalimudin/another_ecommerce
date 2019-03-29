@@ -34,8 +34,6 @@ class CreateCategoryCommand extends ContainerAwareCommand{
         $entityManager->persist($category);
         $entityManager->flush();
 
-
-
     }
 
     protected function interact(InputInterface $input, OutputInterface $output){

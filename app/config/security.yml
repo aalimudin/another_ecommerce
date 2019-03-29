@@ -42,5 +42,9 @@ security:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/admin/, role: ROLE_ADMIN }
-        - { path: ^/product, role: ROLE_USER}
+        - { path: ^/admin, role: ROLE_ADMIN }
+        # - { path: ^/product, role: ROLE_USER }
+        # - { path: ^/cart, role: ROLE_USER }
+        # - { path: ^/address, role: ROLE_USER }
+        # - { path: ^/phone, role: ROLE_USER }
+        # - { path: ^/order, role: ROLE_USER }

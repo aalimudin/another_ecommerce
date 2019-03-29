@@ -2,9 +2,9 @@
 
 namespace AppBundle\Controller;
 
-use App\Entity\Product;
-use App\Entity\User;
-use App\Entity\Cart;
+use AppBundle\Entity\Product;
+use AppBundle\Entity\User;
+use AppBundle\Entity\Cart;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,18 +14,21 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
-class ProductController extends Controller{
+
+class AdminProductController extends Controller{
     /**
-     * @Route("/admin/product", name="product_list")
-     * @Method({"GET"})
+     * @Route("/admin/product", name="admin_product_list")
+     * Method({"GET"})
      */
     public function getProduct(){
         $product = $this->getDoctrine()->getRepository(Product::class)->findAll();
+
+        return $this->render('ecommerce/admin_product.html.twig', array('product' => $product));
     }
 
     /**
      * @Route("/admin/product/update/{id}", name="product_update")
-     * @Method({"POST"})
+     * Method({"POST"})
      */
     public function editProduct(Request $request, $id){
         $product = new Product();
